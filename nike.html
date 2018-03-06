@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Nike</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            background-color: #000;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+<script src="js/three.min.js"></script>
+<script src="js/OrbitControls.js"></script>
+
+<script>
+  var SCREEN_WIDTH = window.innerWidth,
+    SCREEN_HEIGHT = window.innerHeight;
+
+  var container, controls, camera, scene, renderer, mesh, textureCube;
+
+  var mouseX = 0, mouseY = 0;
+  var windowHalfX = window.innerWidth / 2;
+  var windowHalfY = window.innerHeight / 2;
+
+  init();
+  animate();
+
+
+  // FUNCTIONS
+  function init() {
+    container = document.createElement('div');
+    document.body.appendChild(container);
+
+
+    // SCENE
+    var r = "https://threejs.org/examples/textures/cube/pisa/";
+    var urls = [
+      r + "px.png", r + "nx.png",
+      r + "py.png", r + "ny.png",
+      r + "pz.png", r + "nz.png"
+    ];
+    textureCube = new THREE.CubeTextureLoader().load(urls);
+
+    scene = new THREE.Scene();
+    scene.background = textureCube;
+
+
+    // CAMERA
+    var VIEW_ANGLE = 45, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 1, FAR = 1600;
+    camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
+    camera.position.z = 500;
+    // camera.position.set( 185, 40, 170 );
+    // scene.add(camera);
+
+    controls = new THREE.OrbitControls(camera);
+    controls.maxPolarAngle = Math.PI / 2;
+    controls.minDistance = 400;
+    controls.maxDistance = 800;
+
+    // MESH
+    var materials = [
+      new THREE.MeshBasicMaterial({
+        map: new THREE.TextureLoader().load('img/NikeR.png')
+      }),
+      new THREE.MeshBasicMaterial({
+        map: new THREE.TextureLoader().load('img/NikeL.png')
+      }),
+      new THREE.MeshBasicMaterial({
+        map: new THREE.TextureLoader().load('img/NikeUp.png')
+      }),
+      new THREE.MeshBasicMaterial({
+        map: new THREE.TextureLoader().load('img/NikeD.png')
+      }),
+      new THREE.MeshBasicMaterial({
+        map: new THREE.TextureLoader().load('img/NikeF.png')
+      }),
+      new THREE.MeshBasicMaterial({
+        map: new THREE.TextureLoader().load('img/NikeB.png')
+      })
+    ];
+
+    // dice = new THREE.Mesh(new THREE.CubeGeometry(562, 562, 562, materials));
+    // scene.add(dice);
+
+    mesh = new THREE.Mesh(new THREE.BoxGeometry(400, 200, 200), materials);
+    scene.add(mesh);
+
+    // var texture = new THREE.TextureLoader().load('img/nike.jpg');
+    // var geometry = new THREE.BoxBufferGeometry(400, 200, 200);
+    // var material = new THREE.MeshBasicMaterial({map: texture});
+    // mesh = new THREE.Mesh(geometry, material);
+    // scene.add(mesh);
+
+
+    //add ground
+    var grassTex = new THREE.TextureLoader().load('img/ground.png');
+    grassTex.wrapS = THREE.RepeatWrapping;
+    grassTex.wrapT = THREE.RepeatWrapping;
+    grassTex.repeat.x = 4;
+    grassTex.repeat.y = 4;
+    var groundMat = new THREE.MeshBasicMaterial({map: grassTex});
+    var groundGeo = new THREE.PlaneGeometry(800, 600);
+    var ground = new THREE.Mesh(groundGeo, groundMat);
+    ground.position.y = -100;
+    // -90 degrees around the xaxis
+    ground.rotation.x = -Math.PI / 2;
+    // IMPORTANT, draw on both sides
+    ground.doubleSided = true;
+    scene.add(ground);
+
+    // RENDERER
+    renderer = new THREE.WebGLRenderer({antialias: true});
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+    renderer.domElement.style.position = "relative";
+    container.appendChild(renderer.domElement);
+
+    renderer.gammaInput = true;
+    renderer.gammaOutput = true;
+
+
+    // EVENTS
+    window.addEventListener('resize', onWindowResize, false);
+    window.addEventListener('mousemove', onDocumentMouseMove, false);
+  }
+
+  function onWindowResize() {
+    renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+    camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+    camera.updateProjectionMatrix();
+  }
+
+  function onDocumentMouseMove(event) {
+    mouseX = (event.clientX - windowHalfX);
+    mouseY = (event.clientY - windowHalfY);
+  }
+
+  function animate() {
+    requestAnimationFrame(animate);
+    render();
+  }
+
+  function render() {
+    renderer.render(scene, camera);
+  }
+</script>
+
+</body>
+</html>
